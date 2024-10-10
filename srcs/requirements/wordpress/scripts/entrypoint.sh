@@ -1,8 +1,6 @@
-#!/bin#!/bin/sh
+#!/bin/sh
 
 wp_dir='/var/www/html'
-
-sleep 10
 
 if [ ! -e "${wp_dir}/wp-config.php" ]
 then
@@ -26,6 +24,7 @@ then
 				$WP_USER $WP_USER_EMAIL \
 				--user_pass=$WP_USER_PASS \
 				--path=$wp_dir
+
 fi
 
-/usr/sbin/php-fpm81 -F
+/usr/sbin/php-fpm82 -F

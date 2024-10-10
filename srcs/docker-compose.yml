@@ -3,6 +3,7 @@ services:
     build: requirements/nginx
     container_name: nginx
     image: "nginx"
+    init: true
     restart: unless-stopped
     networks:
       - inception 
@@ -17,6 +18,7 @@ services:
     build: requirements/wordpress
     container_name: wordpress
     image: "wordpress"
+    init: true
     restart: unless-stopped
     env_file:
       - .env
@@ -27,12 +29,14 @@ services:
     expose:
       - "9000"
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
 
   mariadb:
     build: requirements/mariadb
     container_name: "mariadb"
     image: "mariadb"
+    init: true
     restart: unless-stopped
     env_file:
       - .env
@@ -42,17 +46,19 @@ services:
       - mariadb:/var/lib/mysql
     expose:
       - "3306"
+    healthcheck:
+      test: "[ -f /good ] && ! mariadb-check"
 
 volumes:
   mariadb:
     driver_opts:
       type: none
-      device: /home/vboxuser/data/mariadb
+      device: /home/sdemaude/data/mariadb
       o: bind
   wordpress:
     driver_opts:
       type: none
-      device: /home/vboxuser/data/wordpress
+      device: /home/sdemaude/data/wordpress
       o: bind
     
 networks:

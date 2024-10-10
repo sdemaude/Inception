@@ -5,8 +5,8 @@ RUN apk add --no-cache \
 		php-fpm \
 		php-mysqli \
 		php-phar \
-		php81-iconv \
-		wget \
+		php-iconv \
+		wget
 
 RUN mkdir -p /var/www/html
 WORKDIR /var/www/html
@@ -19,9 +19,9 @@ RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.ph
 RUN chmod u+x wp-cli.phar
 RUN mv wp-cli.phar /usr/local/bin/wp
 
-COPY conf/www.conf /etc/php81/php-fpm.d/www.conf
-COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY conf/www.conf /etc/php82/php-fpm.d/www.conf
+COPY scripts/entrypoint.sh /entrypoint.sh
 
-RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN chmod u+x /entrypoint.sh
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
