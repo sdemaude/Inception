@@ -9,7 +9,7 @@ down:
 
 fclean: down
 	docker system prune -fa --volumes
-	sudo rm -rf /home/sdemaude/data/mariadb/*
-	sudo rm -rf /home/sdemaude/data/wordpress/*
+	sudo sh -c "rm -rf /home/sdemaude/data/mariadb/*"
+	sudo sh -c "rm -rf /home/sdemaude/data/wordpress/*"
 
 re: fclean all

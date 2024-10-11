@@ -1,4 +1,6 @@
-#!/bin/sh	#?? Specify the shell interpreter
+#!/bin/sh
+
+#?? Specify the shell interpreter
 
 # Start MariaDB in the background without attaching to the terminal
 mariadbd-safe --nowatch
