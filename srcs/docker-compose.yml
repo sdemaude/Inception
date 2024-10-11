@@ -1,37 +1,41 @@
 services:
-  nginx:
-    build: requirements/nginx
-    container_name: nginx
-    image: "nginx"
-    init: true
-    restart: unless-stopped
-    networks:
-      - inception 
-    ports:
-      - "443:443"
-    volumes:
-      - wordpress:/var/www/html
-    depends_on:
-      - wordpress
 
+  # Define Nginx service
+  nginx:
+    build: requirements/nginx                 # Build Nginx from specified directory
+    container_name: "nginx"                   # Name the container
+    image: "nginx"                            #??
+    init: true                                # Ensure proper process handling
+    restart: unless-stopped                   # Restart unless manually stopped
+    networks:
+      - inception                             # Use the 'inception' network
+    ports:
+      - "443:443"                             #?? Map HTTPS port 443 to the host 
+    volumes:
+      - wordpress:/var/www/html               # Share the Wordpress files with Nginx
+    depends_on:
+      - wordpress                             # Wait for WordPress
+
+  # Define WordPress service
   wordpress:
     build: requirements/wordpress
-    container_name: wordpress
+    container_name: "wordpress"
     image: "wordpress"
     init: true
     restart: unless-stopped
     env_file:
-      - .env
+      - .env                                  # Load environment variables from .env file
     networks:
       - inception
     volumes:
-      - wordpress:/var/www/html
+      - wordpress:/var/www/html               # Store WordPress files in a shared volume
     expose:
-      - "9000"
+      - "9000"                                # Expose port 9000 internally
     depends_on:
       mariadb:
-        condition: service_healthy
+        condition: service_healthy            # Ensure MariaDB is healthy before starting
 
+  # Define MariaDB service
   mariadb:
     build: requirements/mariadb
     container_name: "mariadb"
@@ -43,24 +47,26 @@ services:
     networks:
       - inception
     volumes:
-      - mariadb:/var/lib/mysql
+      - mariadb:/var/lib/mysql                #??
     expose:
       - "3306"
-    healthcheck:
-      test: "[ -f /good ] && ! mariadb-check"
+    healthcheck:                    
+      test: "[ -f /good ] && ! mariadb-check" # Health check to verify MariaDB status
 
+# Volumes for persistent data storage
 volumes:
   mariadb:
     driver_opts:
-      type: none
-      device: /home/sdemaude/data/mariadb
-      o: bind
+      type: none                              #?? Use a bind mount
+      device: /home/sdemaude/data/mariadb     # Host directory for MariaDB data
+      o: bind                                 #?? Bind mount options
   wordpress:
     driver_opts:
       type: none
       device: /home/sdemaude/data/wordpress
       o: bind
-    
+
+# Docker network configuration
 networks:
   inception:
-    driver: bridge
+    driver: bridge                            #?? Use a bridge network
