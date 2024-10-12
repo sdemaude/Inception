@@ -1,6 +1,5 @@
 #!/bin/sh
 
-#?? Specify the shell interpreter
 # Define the directory where WordPress is installed
 wp_dir='/var/www/html'
 

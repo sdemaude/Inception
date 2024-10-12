@@ -4,17 +4,18 @@ services:
   nginx:
     build: requirements/nginx                 # Build Nginx from specified directory
     container_name: "nginx"                   # Name the container
-    image: "nginx"                            #??
+    image: "nginx"                            # Name the image
     init: true                                # Ensure proper process handling
     restart: unless-stopped                   # Restart unless manually stopped
     networks:
       - inception                             # Use the 'inception' network
     ports:
-      - "443:443"                             #?? Map HTTPS port 443 to the host 
+      - "443:443"                             # Map HTTPS port 443 to the host 
     volumes:
       - wordpress:/var/www/html               # Share the Wordpress files with Nginx
     depends_on:
-      - wordpress                             # Wait for WordPress
+      wordpress:                             # Wait for WordPress
+        condition: service_healthy
 
   # Define WordPress service
   wordpress:
@@ -28,9 +29,12 @@ services:
     networks:
       - inception
     volumes:
-      - wordpress:/var/www/html               # Store WordPress files in a shared volume
+      - wordpress:/var/www/html               # Store persistent WP files in a shared volume
     expose:
       - "9000"                                # Expose port 9000 internally
+    healthcheck:
+      test: "nc wordpress:9000 -z"
+      interval: 1s
     depends_on:
       mariadb:
         condition: service_healthy            # Ensure MariaDB is healthy before starting
@@ -47,19 +51,20 @@ services:
     networks:
       - inception
     volumes:
-      - mariadb:/var/lib/mysql                #??
+      - mariadb:/var/lib/mysql                # Store persistent MariaDB files
     expose:
       - "3306"
     healthcheck:                    
       test: "[ -f /good ] && ! mariadb-check" # Health check to verify MariaDB status
+      interval: 1s
 
 # Volumes for persistent data storage
 volumes:
   mariadb:
     driver_opts:
-      type: none                              #?? Use a bind mount
+      type: none                              # Type none because using host file system
       device: /home/sdemaude/data/mariadb     # Host directory for MariaDB data
-      o: bind                                 #?? Bind mount options
+      o: bind                                 # Bind mount options
   wordpress:
     driver_opts:
       type: none
@@ -69,4 +74,4 @@ volumes:
 # Docker network configuration
 networks:
   inception:
-    driver: bridge                            #?? Use a bridge network
+    driver: bridge                            # Use a bridge network
